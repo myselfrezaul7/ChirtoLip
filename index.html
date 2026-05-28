@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChitroLip - AI Video Repurposing</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <!-- PWA meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <!-- SVG Filter for iOS 26 Liquid Glass Refraction -->
+    <svg style="display: none;" aria-hidden="true">
+        <defs>
+            <filter id="glass-refract" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+                <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" />
+                <feDisplacementMap in="blur" in2="noise" scale="20" xChannelSelector="R" yChannelSelector="G" result="refraction" />
+                <feBlend in="SourceGraphic" in2="refraction" mode="overlay" />
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="app-container">
+        
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <h1>ChitroLip <span style="font-weight: 300; opacity: 0.8;">AI</span></h1>
+            </div>
+            <div class="header-actions">
+                <div class="api-status" id="api-status-indicator" title="API Status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Demo Mode</span>
+                </div>
+                <button id="btn-toggle-theme" class="icon-btn" title="Toggle Theme" aria-label="Toggle Theme">
+                    <span class="theme-icon-light hidden">☀️</span>
+                    <span class="theme-icon-dark">🌙</span>
+                </button>
+                <button id="btn-history" class="icon-btn tooltip" data-tooltip="Generation History">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </button>
+                <button id="btn-toggle-api" class="icon-btn" title="API Key Setup" aria-label="Setup API Key">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+                </button>
+                <button id="btn-toggle-settings" class="icon-btn" title="Settings (Ctrl+Shift+S)" aria-label="Open Settings">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- HISTORY MODAL -->
+        <div id="history-modal" class="modal-overlay hidden">
+            <div class="modal-content glass-panel" style="max-width: 600px; width: 90%;">
+                <div class="modal-header">
+                    <h2>Generation History</h2>
+                    <button id="btn-close-history" class="icon-btn-small">✕</button>
+                </div>
+                <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+                    <p class="text-muted small mb-2">Past generations are saved locally. Click to restore.</p>
+                    <div id="history-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <!-- History items injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API SETUP PANEL -->
+        <section id="api-setup" class="panel-collapsible panel-hidden">
+            <div class="glass-panel api-card">
+                <div class="api-card-header">
+                    <h3>Google Gemini API Key</h3>
+                    <a href="https://aistudio.google.com/apikey" target="_blank" class="text-link">Get Free API Key ↗</a>
+                </div>
+                <div class="api-input-group">
+                    <input type="password" id="api-key-input" placeholder="AIzaSy..." class="input-glass">
+                    <button id="btn-toggle-visibility" class="icon-btn-small">👁️</button>
+                    <button id="btn-save-api" class="btn-secondary">Save & Test</button>
+                </div>
+                <p class="text-muted small">Key is stored securely in your browser's local storage. Never sent to any external server besides Google.</p>
+            </div>
+        </section>
+
+        <!-- MAIN LAYOUT -->
+        <main class="app-main">
+            
+            <!-- INPUT AREA -->
+            <section id="input-area" class="input-section glass-panel">
+                <div class="tab-bar" role="tablist" aria-label="Input Methods">
+                    <button class="tab-item active" data-tab="tab-transcript" role="tab" aria-selected="true" aria-controls="tab-transcript" tabindex="0">📋 Paste Transcript</button>
+                    <button class="tab-item" data-tab="tab-audio" role="tab" aria-selected="false" aria-controls="tab-audio" tabindex="-1">🎵 Media File</button>
+                    <button class="tab-item" data-tab="tab-document" role="tab" aria-selected="false" aria-controls="tab-document" tabindex="-1">📄 Document</button>
+                    <button class="tab-item" data-tab="tab-youtube" role="tab" aria-selected="false" aria-controls="tab-youtube" tabindex="-1">🔗 YouTube URL</button>
+                    <div class="tab-indicator"></div>
+                </div>
+
+                <div class="tab-content active" id="tab-transcript" role="tabpanel" aria-labelledby="tab-transcript-btn">
+                    <div class="textarea-wrapper">
+                        <textarea id="transcript-input" class="textarea-auto input-glass" placeholder="Paste your video transcript here...&#10;&#10;বাংলা বা ইংরেজি ট্রান্সক্রিপ্ট পেস্ট করুন।&#10;&#10;(Timestamped transcripts are also supported!)"></textarea>
+                        <div class="textarea-footer">
+                            <span class="word-count text-secondary small" id="transcript-word-count">0 words</span>
+                            <button id="btn-load-sample" class="text-link">Load Sample Transcript</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-audio" role="tabpanel" aria-labelledby="tab-audio-btn">
+                    <div id="drop-zone-audio" class="drop-zone">
+                        <div class="drop-zone-content">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            <p>Drag & drop audio or video file here</p>
+                            <span class="text-muted small">MP3, WAV, M4A, MP4, WEBM (Max 100MB)</span>
+                            <button id="btn-browse-audio" class="btn-secondary mt-2">Browse Files</button>
+                            <input type="file" id="file-input-audio" class="hidden" accept="audio/*,video/mp4,video/webm,video/ogg">
+                        </div>
+                        <div id="file-info-audio" class="file-info hidden">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            <span id="file-name-audio" class="file-name text-primary">filename.mp3</span>
+                            <span id="file-size-audio" class="text-muted small">(4.2 MB)</span>
+                            <button id="btn-remove-audio" class="icon-btn-small">✕</button>
+                        </div>
+                    </div>
+                    <p class="text-muted small mt-2">Requires Gemini API key. Uses Two-Step architecture to bypass rate limits.</p>
+                </div>
+
+                <div class="tab-content" id="tab-document" role="tabpanel" aria-labelledby="tab-document-btn">
+                    <div id="drop-zone-doc" class="drop-zone">
+                        <div class="drop-zone-content">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <p>Drag & drop document here</p>
+                            <span class="text-muted small">PDF, TXT, DOCX, CSV</span>
+                            <button id="btn-browse-doc" class="btn-secondary mt-2">Browse Files</button>
+                            <input type="file" id="file-input-doc" class="hidden" accept=".pdf,.txt,.docx,.csv">
+                        </div>
+                        <div id="file-info-doc" class="file-info hidden">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            <span id="file-name-doc" class="file-name text-primary">document.pdf</span>
+                            <span id="file-size-doc" class="text-muted small">(1.2 MB)</span>
+                            <button id="btn-remove-doc" class="icon-btn-small">✕</button>
+                        </div>
+                    </div>
+                    <p class="text-muted small mt-2">Turn long-form written documents into social media content.</p>
+                </div>
+
+                <div class="tab-content" id="tab-youtube" role="tabpanel" aria-labelledby="tab-youtube-btn">
+                    <div class="api-input-group">
+                        <input type="url" id="youtube-url-input" placeholder="https://www.youtube.com/watch?v=..." class="input-glass w-full">
+                    </div>
+                    <div class="info-badge mt-2">
+                        <span class="badge-icon">💡</span>
+                        <p class="text-secondary small">Gemini will natively process the public YouTube video. Long videos may take slightly longer to process.</p>
+                    </div>
+                </div>
+
+                <!-- GENERATE BAR -->
+                <div id="generate-bar" class="generate-bar">
+                    <div style="display: flex; gap: 0.5rem; flex: 1;">
+                        <button id="btn-generate" class="btn-pulse btn-primary">
+                            <span class="btn-text">Generate Content ✨</span>
+                            <span class="shortcut-hint">Ctrl+Enter</span>
+                        </button>
+                        <button id="btn-stop-generate" class="btn-danger hidden" title="Stop Generation">
+                            <span class="btn-text">🛑 Stop</span>
+                        </button>
+                    </div>
+                    
+                    <div id="progress-container" class="progress-container hidden">
+                        <div class="progress-stepper">
+                            <div class="step active" id="step-1">1. Processing input</div>
+                            <div class="step" id="step-2">2. Extracting text</div>
+                            <div class="step" id="step-3">3. Generating outputs</div>
+                        </div>
+                        <div class="progress-bar-bg"><div id="progress-bar-fill" class="progress-bar-fill"></div></div>
+                    </div>
+                </div>
+
+                <div id="token-tracker" class="token-tracker hidden mt-2 text-right">
+                    <span class="badge" style="display: inline-flex; background: transparent; border-color: transparent;">⚡ Tokens Used: <span id="token-count-val" class="text-primary" style="margin-left:4px;">0</span></span>
+                </div>
+            </section>
+
+            <!-- OUTPUT DASHBOARD (BENTO GRID) -->
+            <section id="output-dashboard" class="output-dashboard hidden">
+                <div class="bento-grid">
+                    
+                    <!-- YouTube SEO Pack -->
+                    <div class="bento-card glass-panel card-youtube">
+                        <div class="card-header">
+                            <div class="badge badge-youtube"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent-rose)"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="var(--bg-surface)"/></svg> YouTube Pack</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-youtube" title="Copy">📋</button>
+                                <button class="icon-btn-small btn-score" data-target="out-youtube" data-platform="YouTube" title="Score Content">🏆</button>
+                                <button class="icon-btn-small btn-download" data-target="out-youtube" data-filename="youtube_pack.txt" title="Download">⬇️</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-youtube" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- Thumbnail Concepts -->
+                    <div class="bento-card glass-panel card-thumbnail">
+                        <div class="card-header">
+                            <div class="badge badge-image">🖼️ Thumbnails</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-thumbnail">📋</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-thumbnail" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- Timestamps -->
+                    <div class="bento-card glass-panel card-timestamps">
+                        <div class="card-header">
+                            <div class="badge badge-timestamps">🕐 Timestamps</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-timestamps">📋</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-timestamps" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- SEO Keywords -->
+                    <div class="bento-card glass-panel card-keywords">
+                        <div class="card-header">
+                            <div class="badge badge-keywords">🔑 SEO Keywords</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-keywords">📋</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-keywords" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- Key Moments -->
+                    <div class="bento-card glass-panel card-keymoments">
+                        <div class="card-header">
+                            <div class="badge badge-keymoments">🎯 Key Moments</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-keymoments">📋</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-keymoments" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- Facebook Post -->
+                    <div class="bento-card glass-panel card-facebook">
+                        <div class="card-header">
+                            <div class="badge badge-facebook"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent-blue)"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg> Facebook</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-facebook">📋</button>
+                                <button class="icon-btn-small btn-score" data-target="out-facebook" data-platform="Facebook" title="Score Content">🏆</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-facebook" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- LinkedIn Post -->
+                    <div class="bento-card glass-panel card-linkedin">
+                        <div class="card-header">
+                            <div class="badge badge-linkedin"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent-blue)"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg> LinkedIn</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-linkedin">📋</button>
+                                <button class="icon-btn-small btn-score" data-target="out-linkedin" data-platform="LinkedIn" title="Score Content">🏆</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-linkedin" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- Twitter Thread -->
+                    <div class="bento-card glass-panel card-twitter">
+                        <div class="card-header">
+                            <div class="badge badge-twitter">🐦 X/Thread</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-twitter">📋</button>
+                                <button class="icon-btn-small btn-score" data-target="out-twitter" data-platform="Twitter" title="Score Content">🏆</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-twitter" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- Shorts / Reels Script -->
+                    <div class="bento-card glass-panel card-shorts">
+                        <div class="card-header">
+                            <div class="badge badge-shorts">📱 Shorts Script</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-shorts">📋</button>
+                                <button class="icon-btn-small btn-score" data-target="out-shorts" data-platform="Shorts Script" title="Score Content">🏆</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-shorts" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- Newsletter Snippet -->
+                    <div class="bento-card glass-panel card-newsletter">
+                        <div class="card-header">
+                            <div class="badge badge-newsletter">📧 Newsletter</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-newsletter">📋</button>
+                                <button class="icon-btn-small btn-score" data-target="out-newsletter" data-platform="Newsletter" title="Score Content">🏆</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-newsletter" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                    <!-- SEO Blog Article -->
+                    <div class="bento-card glass-panel card-blog">
+                        <div class="card-header">
+                            <div class="badge badge-blog">✍️ SEO Article</div>
+                            <div class="card-actions">
+                                <button class="icon-btn-small btn-copy" data-target="out-blog">📋</button>
+                                <button class="icon-btn-small btn-score" data-target="out-blog" data-platform="SEO Blog" title="Score Content">🏆</button>
+                                <button class="icon-btn-small btn-expand" id="btn-expand-blog" title="Expand">⤢</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="out-blog" class="streaming-text" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FLOATING EXPORT BAR -->
+        <div id="export-bar" class="export-bar hidden">
+            <button id="btn-export-md" class="btn-primary">
+                Download Full Kit (.md)
+            </button>
+            <button id="btn-export-zip" class="btn-secondary">
+                Bulk Export (.zip)
+            </button>
+            <button id="btn-export-json" class="btn-secondary" title="Export as JSON">
+                { }
+            </button>
+        </div>
+
+    </div>
+
+    <!-- SETTINGS DRAWER -->
+    <div id="settings-overlay" class="drawer-overlay hidden"></div>
+    <div id="settings-drawer" class="settings-drawer closed">
+        <div class="drawer-header">
+            <h2>Settings</h2>
+            <button id="btn-close-settings" class="icon-btn">✕</button>
+        </div>
+        <div class="drawer-body">
+            
+            <!-- SECTION 1: CONTENT GENERATION -->
+            <div class="setting-section-title">Content Generation</div>
+            
+            <div class="setting-group">
+                <label>Target Language</label>
+                <div class="segmented-control">
+                    <input type="radio" name="st_language" id="lang_bn" value="Bengali" checked>
+                    <label for="lang_bn">বাংলা</label>
+                    <input type="radio" name="st_language" id="lang_en" value="English">
+                    <label for="lang_en">English</label>
+                    <input type="radio" name="st_language" id="lang_mix" value="Bilingual">
+                    <label for="lang_mix">Mix</label>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Tone of Voice</label>
+                <select id="st_tone" class="input-glass select-glass w-full">
+                    <option value="Viral and Hype">Viral/Hype 🔥</option>
+                    <option value="Educational and Informative">Educational 📚</option>
+                    <option value="Professional and Authoritative">Professional 💼</option>
+                    <option value="Storytelling and Relatable">Storytelling 📖</option>
+                    <option value="Casual and Conversational">Casual 😎</option>
+                    <option value="Motivational and Inspiring">Motivational 🌟</option>
+                    <option value="Funny and Meme-heavy">Funny/Meme 🤪</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label>Target Audience</label>
+                <input type="text" id="st_audience" class="input-glass w-full" value="বাংলাদেশের ডিজিটাল মার্কেটার ও কন্টেন্ট ক্রিয়েটর">
+            </div>
+
+            <div class="setting-group">
+                <label>Content Niche/Topic (Optional)</label>
+                <input type="text" id="st_niche" class="input-glass w-full" placeholder="e.g., Tech, Finance, Vlogging">
+            </div>
+
+            <div class="setting-group">
+                <label>Brand Voice Samples (Optional)</label>
+                <textarea id="st_brand_voice" class="input-glass w-full" style="min-height: 80px; resize: vertical;" placeholder="Paste 2-3 of your past posts here to let the AI learn your unique writing style..."></textarea>
+            </div>
+
+            <div class="setting-group">
+                <label>Content Length</label>
+                <div class="segmented-control">
+                    <input type="radio" name="st_length" id="len_concise" value="Concise">
+                    <label for="len_concise">Concise</label>
+                    <input type="radio" name="st_length" id="len_standard" value="Standard" checked>
+                    <label for="len_standard">Standard</label>
+                    <input type="radio" name="st_length" id="len_detailed" value="Detailed">
+                    <label for="len_detailed">Detailed</label>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Emoji Density</label>
+                <div class="segmented-control">
+                    <input type="radio" name="st_emojis" id="emo_none" value="None">
+                    <label for="emo_none">None</label>
+                    <input type="radio" name="st_emojis" id="emo_light" value="Light">
+                    <label for="emo_light">Light</label>
+                    <input type="radio" name="st_emojis" id="emo_standard" value="Standard" checked>
+                    <label for="emo_standard">Normal</label>
+                    <input type="radio" name="st_emojis" id="emo_heavy" value="Heavy">
+                    <label for="emo_heavy">Heavy</label>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Call-to-Action (CTA) Style</label>
+                <select id="st_cta" class="input-glass select-glass w-full">
+                    <option value="Question">Engaging Question ❓</option>
+                    <option value="Link">Link to Watch/Read 🔗</option>
+                    <option value="DM">Comment for DM Info 💬</option>
+                    <option value="None">No CTA (End Naturally) 🚫</option>
+                </select>
+            </div>
+
+            <!-- SECTION 2: AI ENGINE -->
+            <div class="setting-section-title">AI Engine</div>
+
+            <div class="setting-group">
+                <label>Gemini Model</label>
+                <select id="st_model" class="input-glass select-glass w-full">
+                    <option value="gemini-2.5-flash">gemini-2.5-flash (Fast, Default)</option>
+                    <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Cost effective)</option>
+                    <option value="gemini-2.5-pro">gemini-2.5-pro (High reasoning)</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label>Creativity (Temperature: <span id="temp-val">0.8</span>)</label>
+                <input type="range" id="st_temperature" min="0" max="1.5" step="0.1" value="0.8" class="range-slider w-full">
+            </div>
+
+            <div class="setting-group">
+                <label>Max Output Tokens: <span id="tokens-val">4096</span></label>
+                <input type="range" id="st_max_tokens" min="2048" max="8192" step="512" value="4096" class="range-slider w-full">
+            </div>
+
+            <div class="setting-row">
+                <label>Safety Filter</label>
+                <div class="toggle-switch-wrapper">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="st_safety" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- SECTION 3: INTERFACE -->
+            <div class="setting-section-title">Interface</div>
+
+            <div class="setting-group">
+                <label>Theme</label>
+                <div class="segmented-control">
+                    <input type="radio" name="st_theme" id="theme_system" value="System" checked>
+                    <label for="theme_system">System</label>
+                    <input type="radio" name="st_theme" id="theme_light" value="Light">
+                    <label for="theme_light">Light</label>
+                    <input type="radio" name="st_theme" id="theme_dark" value="Dark">
+                    <label for="theme_dark">Dark</label>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <label>Auto-Save Outputs</label>
+                <div class="toggle-switch-wrapper">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="st_autosave" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <label>Show Word Count</label>
+                <div class="toggle-switch-wrapper">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="st_wordcount" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- SECTION 4: DATA MANAGEMENT -->
+            <div class="setting-section-title">Data Management</div>
+
+            <div class="settings-btn-grid">
+                <button id="btn-export-settings" class="btn-secondary small" type="button">Export Setup</button>
+                <button id="btn-import-settings" class="btn-secondary small" type="button">Import Setup</button>
+                <input type="file" id="import-settings-file" class="hidden" accept=".json">
+            </div>
+            
+            <button id="btn-reset-settings" class="btn-danger w-full small mt-2" type="button">Reset to Defaults</button>
+
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="toast-container" aria-live="assertive" role="alert"></div>
+
+    <!-- SCRIPTS (Sequential loading for local execution) -->
+    <script src="demo-data.js"></script>
+    <script src="prompts.js"></script>
+    <script src="gemini.js"></script>
+    <script src="export.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
