@@ -57,6 +57,96 @@ let showToastNotification = function(message, type) {
 
 document.addEventListener('DOMContentLoaded', () => {
     
+    // Helper to parse incomplete JSON fields during streaming
+    function parsePartialJSON(jsonStr) {
+        const obj = {};
+        const keys = ["youtube", "thumbnail", "timestamps", "keywords", "keymoments", "facebook", "linkedin", "twitter", "shorts", "newsletter", "blog"];
+        
+        for (const key of keys) {
+            const keyPattern = `"${key}"`;
+            const keyIndex = jsonStr.indexOf(keyPattern);
+            if (keyIndex === -1) continue;
+            
+            const afterKey = jsonStr.substring(keyIndex + keyPattern.length);
+            const colonIndex = afterKey.indexOf(':');
+            if (colonIndex === -1) continue;
+            
+            const afterColon = afterKey.substring(colonIndex + 1);
+            const startQuoteIndex = afterColon.indexOf('"');
+            if (startQuoteIndex === -1) continue;
+            
+            const valueStart = afterColon.substring(startQuoteIndex + 1);
+            
+            let endQuoteIndex = -1;
+            let searchIndex = 0;
+            while (searchIndex < valueStart.length) {
+                const nextQuote = valueStart.indexOf('"', searchIndex);
+                if (nextQuote === -1) break;
+                
+                let backslashes = 0;
+                let i = nextQuote - 1;
+                while (i >= 0 && valueStart[i] === '\\') {
+                    backslashes++;
+                    i--;
+                }
+                
+                if (backslashes % 2 === 0) {
+                    endQuoteIndex = nextQuote;
+                    break;
+                } else {
+                    searchIndex = nextQuote + 1;
+                }
+            }
+            
+            let valueRaw = "";
+            if (endQuoteIndex === -1) {
+                valueRaw = valueStart;
+            } else {
+                valueRaw = valueStart.substring(0, endQuoteIndex);
+            }
+            
+            let cleanValue = "";
+            let i = 0;
+            while (i < valueRaw.length) {
+                if (valueRaw[i] === '\\') {
+                    if (i + 1 < valueRaw.length) {
+                        const esc = valueRaw[i + 1];
+                        if (esc === '"') { cleanValue += '"'; i += 2; }
+                        else if (esc === '\\') { cleanValue += '\\'; i += 2; }
+                        else if (esc === '/') { cleanValue += '/'; i += 2; }
+                        else if (esc === 'b') { cleanValue += '\b'; i += 2; }
+                        else if (esc === 'f') { cleanValue += '\f'; i += 2; }
+                        else if (esc === 'n') { cleanValue += '\n'; i += 2; }
+                        else if (esc === 'r') { cleanValue += '\r'; i += 2; }
+                        else if (esc === 't') { cleanValue += '\t'; i += 2; }
+                        else if (esc === 'u') {
+                            if (i + 5 < valueRaw.length) {
+                                const code = valueRaw.substring(i + 2, i + 6);
+                                cleanValue += String.fromCharCode(parseInt(code, 16));
+                                i += 6;
+                            } else {
+                                cleanValue += '\\u';
+                                i += 2;
+                            }
+                        } else {
+                            cleanValue += esc;
+                            i += 2;
+                        }
+                    } else {
+                        i++;
+                    }
+                } else {
+                    cleanValue += valueRaw[i];
+                    i++;
+                }
+            }
+            
+            obj[key] = cleanValue;
+        }
+        
+        return obj;
+    }
+
     // ==========================================
     // STATE MANAGEMENT
     // ==========================================
@@ -1110,7 +1200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         inlineData: inlineDataObj,
                         onChunk: (jsonStr) => {
                             try {
-                                const partial = JSON.parse(jsonStr);
+                                const partial = parsePartialJSON(jsonStr);
                                 outputIds.forEach(id => {
                                     if (partial[id] && DOM.outputDivs[id]) {
                                         renderStreamingText(DOM.outputDivs[id], partial[id]);
@@ -1193,7 +1283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 onTokens: (count) => accumulateTokens(count),
                 onChunk: (jsonStr) => {
                     try { 
-                        const partial = JSON.parse(jsonStr);
+                        const partial = parsePartialJSON(jsonStr);
                         if (partial.youtube && DOM.outputDivs.youtube) renderStreamingText(DOM.outputDivs.youtube, partial.youtube);
                         if (partial.thumbnail && DOM.outputDivs.thumbnail) renderStreamingText(DOM.outputDivs.thumbnail, partial.thumbnail);
                     } catch(e) {} 
@@ -1212,7 +1302,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 onTokens: (count) => accumulateTokens(count),
                 onChunk: (jsonStr) => {
                     try { 
-                        const partial = JSON.parse(jsonStr);
+                        const partial = parsePartialJSON(jsonStr);
                         if (partial.facebook && DOM.outputDivs.facebook) renderStreamingText(DOM.outputDivs.facebook, partial.facebook);
                         if (partial.linkedin && DOM.outputDivs.linkedin) renderStreamingText(DOM.outputDivs.linkedin, partial.linkedin);
                         if (partial.twitter && DOM.outputDivs.twitter) renderStreamingText(DOM.outputDivs.twitter, partial.twitter);
@@ -1233,7 +1323,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 onTokens: (count) => accumulateTokens(count),
                 onChunk: (jsonStr) => {
                     try { 
-                        const partial = JSON.parse(jsonStr);
+                        const partial = parsePartialJSON(jsonStr);
                         if (partial.shorts && DOM.outputDivs.shorts) renderStreamingText(DOM.outputDivs.shorts, partial.shorts);
                         if (partial.blog && DOM.outputDivs.blog) renderStreamingText(DOM.outputDivs.blog, partial.blog);
                     } catch(e) {} 
@@ -1252,7 +1342,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 onTokens: (count) => accumulateTokens(count),
                 onChunk: (jsonStr) => {
                     try { 
-                        const partial = JSON.parse(jsonStr);
+                        const partial = parsePartialJSON(jsonStr);
                         if (partial.timestamps && DOM.outputDivs.timestamps) renderStreamingText(DOM.outputDivs.timestamps, partial.timestamps);
                         if (partial.keywords && DOM.outputDivs.keywords) renderStreamingText(DOM.outputDivs.keywords, partial.keywords);
                         if (partial.keymoments && DOM.outputDivs.keymoments) renderStreamingText(DOM.outputDivs.keymoments, partial.keymoments);
@@ -1508,7 +1598,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             safetyFilter: AppState.settings.safetyFilter,
                             onChunk: (text) => {
                                 try {
-                                    const parsed = JSON.parse(text);
+                                    const parsed = parsePartialJSON(text);
                                     if (parsed[key]) {
                                         renderStreamingText(streamDiv, parsed[key]);
                                     }

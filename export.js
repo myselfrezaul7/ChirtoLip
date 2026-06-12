@@ -75,9 +75,9 @@ window.ExportUtils = {
 
         sections.forEach(sec => {
             if (outputs[sec.key]) {
-                md += \`## \${sec.title}\\n\\n\`;
-                md += \`\${outputs[sec.key]}\\n\\n\`;
-                md += \`---\\n\\n\`;
+                md += `## ${sec.title}\n\n`;
+                md += `${outputs[sec.key]}\n\n`;
+                md += `---\n\n`;
             }
         });
 
