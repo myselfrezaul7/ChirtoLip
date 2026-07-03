@@ -1,5 +1,5 @@
 /**
- * VIDTOCONTENT PRO - GEMINI API CLIENT
+ * CHITROLIP AI - GEMINI API CLIENT
  * Handles streaming SSE connections, JSON structured outputs, and multimodal inputs.
  */
 
@@ -202,6 +202,100 @@ window.GeminiAPI = (function() {
                 };
                 reader.onerror = error => reject(error);
             });
+        },
+
+        /**
+         * Helper to parse incomplete JSON fields during streaming
+         * @param {string} jsonStr - Raw JSON string
+         * @returns {Object} Parsed JSON object
+         */
+        parsePartialJSON: function(jsonStr) {
+            const obj = {};
+            const keys = ["youtube", "thumbnail", "timestamps", "keywords", "keymoments", "facebook", "linkedin", "twitter", "shorts", "newsletter", "blog"];
+            
+            for (const key of keys) {
+                const keyPattern = `"${key}"`;
+                const keyIndex = jsonStr.indexOf(keyPattern);
+                if (keyIndex === -1) continue;
+                
+                const afterKey = jsonStr.substring(keyIndex + keyPattern.length);
+                const colonIndex = afterKey.indexOf(':');
+                if (colonIndex === -1) continue;
+                
+                const afterColon = afterKey.substring(colonIndex + 1);
+                const startQuoteIndex = afterColon.indexOf('"');
+                if (startQuoteIndex === -1) continue;
+                
+                const valueStart = afterColon.substring(startQuoteIndex + 1);
+                
+                let endQuoteIndex = -1;
+                let searchIndex = 0;
+                while (searchIndex < valueStart.length) {
+                    const nextQuote = valueStart.indexOf('"', searchIndex);
+                    if (nextQuote === -1) break;
+                    
+                    let backslashes = 0;
+                    let i = nextQuote - 1;
+                    while (i >= 0 && valueStart[i] === '\\') {
+                        backslashes++;
+                        i--;
+                    }
+                    
+                    if (backslashes % 2 === 0) {
+                        endQuoteIndex = nextQuote;
+                        break;
+                    } else {
+                        searchIndex = nextQuote + 1;
+                    }
+                }
+                
+                let valueRaw = "";
+                if (endQuoteIndex === -1) {
+                    valueRaw = valueStart;
+                } else {
+                    valueRaw = valueStart.substring(0, endQuoteIndex);
+                }
+                
+                let cleanValue = "";
+                let i = 0;
+                while (i < valueRaw.length) {
+                    if (valueRaw[i] === '\\') {
+                        if (i + 1 < valueRaw.length) {
+                            const esc = valueRaw[i + 1];
+                            if (esc === '"') { cleanValue += '"'; i += 2; }
+                            else if (esc === '\\') { cleanValue += '\\'; i += 2; }
+                            else if (esc === '/') { cleanValue += '/'; i += 2; }
+                            else if (esc === 'b') { cleanValue += '\b'; i += 2; }
+                            else if (esc === 'f') { cleanValue += '\f'; i += 2; }
+                            else if (esc === 'n') { cleanValue += '\n'; i += 2; }
+                            else if (esc === 'r') { cleanValue += '\r'; i += 2; }
+                            else if (esc === 't') { cleanValue += '\t'; i += 2; }
+                            else if (esc === 'u') {
+                                if (i + 5 < valueRaw.length) {
+                                    const code = valueRaw.substring(i + 2, i + 6);
+                                    cleanValue += String.fromCharCode(parseInt(code, 16));
+                                    i += 6;
+                                } else {
+                                    cleanValue += '\\u';
+                                    i += 2;
+                                }
+                            } else {
+                                cleanValue += esc;
+                                i += 2;
+                            }
+                        } else {
+                            i++;
+                        }
+                    } else {
+                        cleanValue += valueRaw[i];
+                        i++;
+                    }
+                }
+                
+                obj[key] = cleanValue;
+            }
+            
+            return obj;
         }
     };
 })();

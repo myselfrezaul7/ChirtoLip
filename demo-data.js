@@ -1,10 +1,10 @@
 /**
- * VIDTOCONTENT PRO - DEMO DATA
+ * CHITROLIP AI - DEMO DATA
  * High-quality Bengali sample content for testing the UI without an API key.
  */
 
 window.DemoData = {
-    transcript: `সবাইকে স্বাগতম! আজকে আমরা কথা বলবো কিভাবে আপনি খুব সহজেই এআই ব্যবহার করে আপনার ইউটিউব ভিডিওর জন্য কন্টেন্ট তৈরি করতে পারেন। অনেকেই আমাকে প্রশ্ন করেন, "ভাই, ভিডিও বানানোর পর টাইটেল, ডেসক্রিপশন, এবং সোশ্যাল মিডিয়া পোস্ট লিখতে গিয়ে অনেক সময় নষ্ট হয়। এর কি কোনো সহজ সমাধান আছে?" হ্যাঁ, আছে। 
+    transcript_bn: `সবাইকে স্বাগতম! আজকে আমরা কথা বলবো কিভাবে আপনি খুব সহজেই এআই ব্যবহার করে আপনার ইউটিউব ভিডিওর জন্য কন্টেন্ট তৈরি করতে পারেন। অনেকেই আমাকে প্রশ্ন করেন, "ভাই, ভিডিও বানানোর পর টাইটেল, ডেসক্রিপশন, এবং সোশ্যাল মিডিয়া পোস্ট লিখতে গিয়ে অনেক সময় নষ্ট হয়। এর কি কোনো সহজ সমাধান আছে?" হ্যাঁ, আছে। 
 
 আজকে আমি আপনাদের এমন একটি মেথড দেখাবো যার মাধ্যমে আপনি আপনার ভিডিওর ট্রান্সক্রিপ্ট থেকে মাত্র এক ক্লিকেই ফেসবুক পোস্ট, লিঙ্কডইন আর্টিকেল, ইউটিউব এসইও প্যাক এবং শর্টস স্ক্রিপ্ট তৈরি করতে পারবেন। আমরা মূলত গুগল জেমিনাই বা চ্যাটজিপিটি ব্যবহার করবো। 
 
@@ -14,7 +14,7 @@ window.DemoData = {
 
 এই সিস্টেমটি একবার সেট আপ করে নিলে, আপনার প্রতি সপ্তাহে অন্তত ৫ থেকে ১০ ঘণ্টা সময় বেঁচে যাবে। যারা একা কাজ করেন অর্থাৎ সলো-ক্রিয়েটর, তাদের জন্য এটি একটি গেম চেঞ্জার। তো চলুন স্ক্রিনে গিয়ে প্র্যাকটিক্যালি দেখে নেই পুরো প্রসেসটা কীভাবে কাজ করে।`,
 
-    outputs: {
+    outputs_bn: {
         youtube: `### Titles (Pick your favorite)
 1. ভিডিও থেকে কন্টেন্ট: AI দিয়ে বাঁচান আপনার ১০ ঘণ্টা সময়!
 2. ইউটিউবারদের জন্য সেরা AI ট্রিকস (২০২৬ গাইড)
@@ -196,6 +196,160 @@ How to write prompt for YouTube SEO
 ### FAQ
 Can I use ChatGPT for this?
 Is Gemini API free in Bangladesh?`,
+
+        keymoments: `### 1. The Core Problem (0:45 - 1:15)
+**Why it's viral:** Hooks the audience by addressing the exact pain point every creator feels — wasting hours writing captions. High relatability.
+
+### 2. The AI Solution Reveal (1:30 - 2:00)
+**Why it's viral:** Offers an immediate, free solution (Gemini) that sounds like magic. Perfect for an educational Short.
+
+### 3. The 10-Hour Claim (4:50 - 5:10)
+**Why it's viral:** A strong value proposition (saving 10 hours a week). Great for a punchy, fast-paced reel ending with a call to action.`
+    },
+
+    transcript_en: `Welcome back! Today we're talking about how to easily use AI to generate content for your YouTube videos. A lot of people ask me, "Hey, after making a video, writing the title, description, and social media posts takes up so much time. Is there an easier way?" Yes, there is.
+
+Today I'll show you a method to generate Facebook posts, LinkedIn articles, a YouTube SEO pack, and Shorts scripts from your video transcript in just one click. We'll primarily be using Google Gemini or ChatGPT.
+
+First, after recording your video, extract the audio file. Then use any speech-to-text tool or Gemini directly to generate the transcript. Once you have the transcript, the real work begins.
+
+You need to use a prompt framework. Clearly state your target audience, the tone of your content (like casual, professional, or viral), and what format is needed for which platform. For example, for Facebook we use emojis and short paragraphs, whereas for LinkedIn we keep a more professional and informative tone.
+
+Once you set up this system, it will save you at least 5 to 10 hours every week. For solo creators, this is an absolute game-changer. So let's jump into the screen and see practically how this whole process works.`,
+
+    outputs_en: {
+        youtube: `### Titles (Pick your favorite)
+1. AI Content Creation: Save 10 Hours a Week!
+2. The Best AI Tricks for YouTubers (2026 Guide)
+3. 1-Click Facebook, YouTube & LinkedIn Posts!
+4. No More Post-Production Hassle | AI Workflow
+5. The Ultimate Game-Changer for Solo Creators!
+
+### Description
+Spending hours writing titles, descriptions, and social media posts after making a video? 😫 In today's video, I'll show you how to use AI to generate content for all platforms from your video in just one click!
+
+📌 In this video:
+0:00 - Introduction
+0:45 - The biggest problem for creators
+1:30 - How to transcribe audio to text
+2:15 - The secret AI prompt framework
+3:30 - Practical screen share demo
+4:50 - Tips for solo creators
+
+If you found this helpful, drop a like and subscribe for more content creation tips!
+
+#AITools #ContentCreation #YouTubeSEO #CreatorEconomy`,
+
+        facebook: `🔥 Does it take you hours to write descriptions and social posts after editing a video?
+
+I get asked this all the time. As a solo creator, managing everything is exhausting. But I recently adopted an AI method that's saving me at least 10 hours a week! 🚀
+
+How does it work? Let's break it down:
+✅ Extract the audio from your video to get a transcript.
+✅ Feed that transcript into Gemini or ChatGPT.
+✅ Use a specific prompt to dictate what content you need for which platform.
+
+Boom! Your YouTube SEO pack, Facebook post, and LinkedIn article are ready in one click! 🤯
+
+Are you using AI for content creation yet? What's your favorite tool? Let me know below! 👇
+
+#ContentCreator #ProductivityHacks #TechTips`,
+
+        linkedin: `As a content creator, I used to spend almost as much time packaging my video (writing titles, descriptions, and social media posts) as I did recording it. Not anymore.
+
+Recently, I've integrated a simple AI workflow that saves me 5-10 hours every week. Here is the exact framework I use:
+
+1️⃣ Audio Extraction: Convert the final video into an audio file.
+2️⃣ Transcription: Use AI to generate a highly accurate transcript.
+3️⃣ Prompting: Feed the text into Gemini with strict format guardrails for LinkedIn, X, and YouTube.
+
+The result? Hours of administrative formatting completely eliminated, allowing me to focus on actual content strategy and production.
+
+If you are a solo creator or digital marketer, this process is a non-negotiable for scaling your output. 
+
+Have you automated your post-production workflow yet?
+
+#DigitalMarketing #AI #Productivity #CreatorEconomy`,
+
+        twitter: `🧵 Spending hours writing titles & social posts after editing a video?
+
+Stop doing that. Here is the exact 1-click AI workflow I use to save 10+ hours a week as a solo creator: 👇
+
+1/ Extract audio from your finished video & generate a text transcript using AI.
+
+2/ Feed the transcript into Google Gemini. 
+
+3/ The secret sauce: The Prompt Framework. Tell the AI your exact audience, tone, and platform limits (e.g. "short paragraphs for FB, professional for LinkedIn").
+
+4/ Boom. You now have YouTube SEO, FB posts, and a newsletter drafted in seconds. Focus on creating, let AI handle the formatting. 🚀`,
+
+        shorts: `[Fast paced, energetic tone]
+Are you still spending hours writing social media posts after you finish editing a video? Stop right now! 
+
+Here is an AI trick that will save you 10 hours every single week. 
+
+Step one, take your finished video and get the audio transcript. 
+
+Step two, throw that transcript into Gemini or ChatGPT. 
+
+Step three, and this is the most important part, use a strict prompt framework. Tell the AI exactly what platforms you need content for, and what tone to use. 
+
+In one click, it will generate your YouTube description, Facebook post, and LinkedIn article automatically. 
+
+If you are a solo creator, you need to be doing this. Subscribe for more AI creator tips!`,
+
+        newsletter: `### Subject: The AI Trick Saving Me 10 Hours a Week 🚀
+
+Hi everyone,
+
+If you're anything like me, you know the exhaustion that hits *after* you finish editing a video. The video is done, but now you have to write the YouTube description, come up with a catchy title, draft a Facebook post, and rewrite it for LinkedIn. It's draining.
+
+But recently, I've completely automated this process using AI, and it's saving me up to 10 hours a week.
+
+**The 1-Click Content Workflow:**
+1. **Transcribe**: Grab the audio transcript of your video.
+2. **AI Processing**: Feed it into Google Gemini.
+3. **The Prompt**: Use a detailed prompt framework that specifies your target audience and the exact tone for each platform.
+
+Instead of staring at a blank page, you get perfectly formatted drafts for every platform instantly. You just review, tweak, and post.
+
+For solo creators, this is the ultimate game changer. Try it out on your next upload and let me know how much time you save!
+
+Best,
+[Your Name]`,
+
+        blog: `# How to Use AI to Turn One Video into 11 Pieces of Content
+
+Creating content is hard enough, but distributing it shouldn't be. If you're a solo creator spending hours writing titles, descriptions, and social media posts, you're wasting valuable time. 
+
+In this guide, we'll walk through a simple AI workflow using Google Gemini that can save you 5 to 10 hours a week.
+
+## 1. Extract the Transcript
+The foundation of this workflow is your video's transcript. Once your video is recorded, use a speech-to-text tool to generate an accurate text version of what you said.
+
+## 2. The Power of Prompting
+Simply asking an AI to "write a post" isn't enough. You need a framework. A good prompt specifies:
+- **Target Audience:** Who is this for?
+- **Tone:** Is it casual, viral, or professional?
+- **Platform Format:** Short paragraphs and emojis for Facebook, structured insights for LinkedIn.
+
+## 3. Generate and Distribute
+Once you feed your transcript and prompt into the AI, you instantly get a cohesive package of content tailored for every major platform. Review the output, make minor adjustments to ensure it matches your personal brand voice, and schedule your posts!
+
+By automating the packaging process, you can get back to what you do best: creating great videos.`,
+
+        thumbnail: `**Concept 1:** Split screen. Left side: A creator looking exhausted at a laptop with a clock showing 3 AM. Right side: The creator smiling with a glowing AI logo and "1 CLICK" text.
+**Concept 2:** Close up of the creator pointing at a glowing Gemini logo, with bold text reading "SAVE 10 HOURS" with an arrow pointing to social media icons.
+**Concept 3:** Clean, minimalist. The YouTube, Facebook, and LinkedIn logos hovering over a single video file, connected by glowing lines. Text: "1 Video = 11 Posts".`,
+
+        timestamps: `0:00 - Introduction
+0:45 - The biggest problem for creators
+1:30 - How to transcribe audio to text
+2:15 - The secret AI prompt framework
+3:30 - Practical screen share demo
+4:50 - Tips for solo creators`,
+
+        keywords: `AI content creation, YouTube SEO, Gemini tutorial, ChatGPT for YouTubers, solo creator tips, productivity hacks, repurpose content, digital marketing, AI tools 2026, content strategy`,
 
         keymoments: `### 1. The Core Problem (0:45 - 1:15)
 **Why it's viral:** Hooks the audience by addressing the exact pain point every creator feels — wasting hours writing captions. High relatability.

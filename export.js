@@ -1,5 +1,5 @@
 /**
- * VIDTOCONTENT PRO - EXPORT UTILITIES
+ * CHITROLIP AI - EXPORT UTILITIES
  * Compiles outputs into Markdown/JSON and handles copying/downloading.
  */
 

@@ -1,21 +1,17 @@
 {
-  "name": "ChitroLip AI Repurposing",
+  "name": "ChitroLip AI — Content Repurposing",
   "short_name": "ChitroLip",
-  "description": "Viral content engine for Bengali creators. Transform video to content instantly.",
+  "description": "Transform video transcripts into 11 pieces of viral, platform-optimized content for Bengali creators. Powered by Google Gemini.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#121212",
+  "background_color": "#050508",
+  "theme_color": "#007aff",
   "icons": [
     {
-      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'></polygon></svg>",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'></polygon></svg>",
-      "sizes": "512x512",
-      "type": "image/svg+xml"
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }

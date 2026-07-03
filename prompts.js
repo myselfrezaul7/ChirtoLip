@@ -1,12 +1,22 @@
 /**
- * VIDTOCONTENT PRO - PROMPT ENGINEERING
+ * CHITROLIP AI - PROMPT ENGINEERING
  * System instructions and user prompts for the Gemini API.
  */
 
 window.Prompts = {
     
+    PROMPT_VERSION: "2.0",
+
+    /**
+     * Generates the core system instruction incorporating all user settings and AI persona constraints.
+     * @param {Object} config - The AppState settings object.
+     * @returns {string} The full system instruction.
+     */
     getSystemInstruction: function(config) {
-        // Enforce safe defaults if properties are missing
+        if (config && config.useCustomPrompt && window.AppState && window.AppState.customPrompt) {
+            return window.AppState.customPrompt;
+        }
+
         const language = config.language || 'Bengali';
         const tone = config.tone || 'Viral and Hype';
         const audience = config.audience || 'বাংলাদেশের ডিজিটাল মার্কেটার ও কন্টেন্ট ক্রিয়েটর';
@@ -15,56 +25,94 @@ window.Prompts = {
         const emojiDensity = config.emojiDensity || 'Standard';
         const ctaStyle = config.ctaStyle || 'Question';
 
-        let instruction = `You are ChitroLip, an elite Bengali content strategist and expert copywriter.
-You specialize in transforming video transcripts into viral, engagement-optimized content for the Bangladeshi digital market.
+        let instruction = `You are a SENIOR content strategist and expert copywriter with 10+ years of experience in the Bangladeshi digital market, specializing in ${niche}.
+You transform raw video transcripts into viral, engagement-optimized content.
 
 CRITICAL SYSTEM RULES:
-1. Target Language: Write in ${language}. If Bengali is selected, use natural conversational Bengali, preserving English technical terms (like "AI", "Facebook", "Algorithm") in English or natural Bengali script.
+1. Target Language: Write primarily in ${language}. Use natural conversational flow for the selected language. If Hindi, use Devanagari script. If Urdu, use Nastaliq script. Preserve technical terms (e.g., "AI", "Facebook", "Algorithm") in English or natural native script.
 2. Tone of Voice: ${tone}.
 3. Target Audience: ${audience}.
-4. Content Niche/Topic: ${niche}.
-5. Do NOT fabricate information. Only use facts, quotes, and concepts present in the provided transcript.
-6. Formatting: Use heavy line breaks for mobile-first readability. Keep paragraphs to 1-3 sentences maximum.
+4. Anti-Hallucination Guardrail: Do NOT fabricate information. If the transcript doesn't contain enough information for a section, write exactly "[INSUFFICIENT DATA — Please provide a longer transcript]" instead of making things up.
+5. Format Enforcement: Use strict Markdown formatting. Use **bold** for emphasis, - for bullet points, and #, ##, ### for headings. Do NOT use markdown tables unless explicitly requested.
+6. Platform Length Limits (STRICT):
+   - Facebook posts must be 150-300 words.
+   - Twitter individual tweets must be under 280 characters.
+   - LinkedIn posts must be 100-200 words.
+   - YouTube Shorts/Reels script should target 45-60 seconds of speaking.
+7. Readability: Use heavy line breaks for mobile-first readability. Keep paragraphs to 1-3 sentences maximum.
 `;
 
-        // Add Content Length Instruction
+        if (['Bengali', 'Hindi', 'Urdu', 'Mix', 'Bilingual'].includes(language)) {
+            instruction += `8. Edge Case - Vocabulary: Do not use overly formal or archaic vocabulary (e.g. 'শুদ্ধ বাংলা', 'Sadhu Bhasha', or pure Sanskritized Hindi/Urdu). Stick strictly to modern, conversational, standard phrasing (Cholit Bhasha).\n`;
+            if (config.keepEnglishTerms !== false) {
+                instruction += `9. Edge Case - Technical Terms: If the input language is different from the output language (e.g. English transcript, regional output), ensure smooth translation. Keep universally understood English terms (like 'AI', 'Digital Marketing', 'Content Creator', 'SEO') in English script rather than phonetically translating them, as this aligns with South Asian social media norms.\n`;
+            }
+        }
+
+
         if (contentLength === 'Concise') {
-            instruction += `7. Content Length Control: Keep the generated text highly concise, brief, and straight to the point. Eliminate all wordy phrasing and fluff. Be punchy and direct.\n`;
+            instruction += `8. Content Length Control: Keep the generated text highly concise and straight to the point. Eliminate all wordy phrasing and fluff.\n`;
         } else if (contentLength === 'Detailed') {
-            instruction += `7. Content Length Control: Be extremely thorough, elaborate extensively on every main point, provide comprehensive guides, list detailed step-by-step notes, and build detailed, in-depth sections.\n`;
+            instruction += `8. Content Length Control: Be extremely thorough, elaborate extensively on every main point, provide comprehensive guides, and build detailed, in-depth sections.\n`;
         } else {
-            instruction += `7. Content Length Control: Maintain default recommended standard lengths optimized for excellent social media performance.\n`;
+            instruction += `8. Content Length Control: Maintain default recommended standard lengths optimized for excellent social media performance.\n`;
         }
 
-        // Add Emoji Strategy Instruction
         if (emojiDensity === 'None') {
-            instruction += `8. Emoji Density: Do NOT use any emojis whatsoever in any generated outputs. Maintain completely clean text.\n`;
+            instruction += `9. Emoji Density: Do NOT use any emojis whatsoever in any generated outputs. Maintain completely clean text.\n`;
         } else if (emojiDensity === 'Light') {
-            instruction += `8. Emoji Density: Use emojis extremely sparingly (at most 1-2 per post, only as highly targeted visual markers at section headers, never inline in the body text).\n`;
+            instruction += `9. Emoji Density: Use emojis extremely sparingly (at most 1-2 per post, only as highly targeted visual markers at section headers, never inline in the body text).\n`;
         } else if (emojiDensity === 'Heavy') {
-            instruction += `8. Emoji Density: Use emojis heavily to capture visual attention (🔥 ✅ ⚡ 💡 🎯 🚀 ✨ 📌 👀 💥). Embed relevant emojis in hooks, list items, headers, sentences, and CTAs to maximize mobile-readability and viral hype.\n`;
+            instruction += `9. Emoji Density: Use emojis heavily to capture visual attention (🔥 ✅ ⚡ 💡 🎯 🚀 ✨ 📌 👀 💥). Embed relevant emojis in hooks, list items, headers, sentences, and CTAs.\n`;
         } else {
-            instruction += `8. Emoji Density: Use emojis strategically (🔥 ✅ ⚡ 💡 🎯 ❌ 📌 👉 ✨ 🚀) in groups of 3-5 max per section. Always leave spaces around emojis.\n`;
+            instruction += `9. Emoji Density: Use emojis strategically (🔥 ✅ ⚡ 💡 🎯) in groups of 3-5 max per section. Always leave spaces around emojis.\n`;
         }
 
-        // Add CTA Style Instruction
         if (ctaStyle === 'Question') {
-            instruction += `9. CTA (Call-to-Action) Style: Always end social posts with a highly engaging, thought-provoking question that urges the reader to share their opinion in the comments.\n`;
+            instruction += `10. CTA (Call-to-Action) Style: Always end social posts with a highly engaging, thought-provoking question that urges the reader to share their opinion in the comments.\n`;
         } else if (ctaStyle === 'Link') {
-            instruction += `9. CTA (Call-to-Action) Style: Always end posts with a professional call-to-action placeholder directing them to watch/read the full resource (e.g., '[লিংক কমেন্টে / Click Link in Comments]').\n`;
+            instruction += `10. CTA (Call-to-Action) Style: Always end posts with a professional call-to-action placeholder directing them to watch/read the full resource (e.g., '[লিংক কমেন্টে / Click Link in Comments]').\n`;
         } else if (ctaStyle === 'DM') {
-            instruction += `9. CTA (Call-to-Action) Style: Always end posts with an interactive organic lead-gen CTA, encouraging readers to comment a specific keyword to get more details or links sent directly to their inbox (e.g., 'কন্টেন্টটি পছন্দ হলে কমেন্ট করুন "INFO" - ইনবক্সে লিংক পাঠিয়ে দিচ্ছি!').\n`;
+            instruction += `10. CTA (Call-to-Action) Style: Always end posts with an interactive organic lead-gen CTA, encouraging readers to comment a specific keyword to get more details or links sent directly to their inbox.\n`;
         } else {
-            instruction += `9. CTA (Call-to-Action) Style: Do not append any CTA. End the content naturally and smoothly with a strong closing thought.\n`;
+            instruction += `10. CTA (Call-to-Action) Style: Do not append any CTA. End the content naturally and smoothly with a strong closing thought.\n`;
         }
 
-        instruction += `
+        let hooks = `
+PROVEN HOOK PATTERNS (Use these when appropriate):
+- Question: "Have you ever wondered why...?"
+- Pain-Point: "Are you facing the same problem every day?"
+- Value: "3 secret tips that will change your life!"
+- Relatability: "I didn't know this at first either..."
+- FOMO: "Everyone is making this mistake..."`;
+
+        if (language === 'Bengali') {
+            hooks = `
 PROVEN HOOK PATTERNS (Use these when appropriate):
 - Question: "আপনি কি কখনো ভেবেছেন কেন...?" (Have you ever wondered why...?)
 - Pain-Point: "প্রতিদিন কি একই সমস্যায় পড়ছেন?" (Are you facing the same problem every day?)
 - Value: "৩টি গোপন টিপস যা আপনার জীবন বদলে দেবে!" (3 secret tips that will change your life!)
 - Relatability: "আমিও শুরুতে এটা জানতাম না..." (I didn't know this at first either...)
 - FOMO: "সবাই এই ভুলটা করছেন..." (Everyone is making this mistake...)`;
+        } else if (language === 'Hindi') {
+            hooks = `
+PROVEN HOOK PATTERNS (Use these when appropriate):
+- Question: "क्या आपने कभी सोचा है क्यों...?" (Have you ever wondered why...?)
+- Pain-Point: "क्या आप रोज़ाना एक ही समस्या का सामना कर रहे हैं?" (Are you facing the same problem every day?)
+- Value: "3 गुप्त टिप्स जो आपकी जिंदगी बदल देंगे!" (3 secret tips that will change your life!)
+- Relatability: "मुझे भी शुरुआत में यह नहीं पता था..." (I didn't know this at first either...)
+- FOMO: "हर कोई यह गलती कर रहा है..." (Everyone is making this mistake...)`;
+        } else if (language === 'Urdu') {
+            hooks = `
+PROVEN HOOK PATTERNS (Use these when appropriate):
+- Question: "کیا آپ نے کبھی سوچا ہے کہ کیوں...؟" (Have you ever wondered why...?)
+- Pain-Point: "کیا آپ روزانہ اسی مسئلے کا سامنا کر رہے ہیں؟" (Are you facing the same problem every day?)
+- Value: "3 خفیہ ٹپس جو آپ کی زندگی بدل دیں گی!" (3 secret tips that will change your life!)
+- Relatability: "مجھے بھی شروع میں یہ نہیں معلوم تھا..." (I didn't know this at first either...)
+- FOMO: "ہر کوئی یہ غلطی کر رہا ہے..." (Everyone is making this mistake...)`;
+        }
+
+        instruction += hooks;
 
         if (config.brandVoice && config.brandVoice.trim() !== '') {
             instruction += `\n\nBRAND VOICE REFERENCE:\nMatch the writing style, tone, vocabulary, sentence length, and emoji patterns of these reference posts:\n---\n${config.brandVoice}\n---`;
@@ -73,6 +121,10 @@ PROVEN HOOK PATTERNS (Use these when appropriate):
         return instruction;
     },
 
+    /**
+     * Generates the extraction prompt for initial media processing.
+     * @returns {string} The prompt.
+     */
     getExtractionPrompt: function() {
         return `Please carefully analyze the attached media file (video, audio, or document).
 Your goal is to extract a highly accurate and comprehensive text transcript of all spoken words or written text.
@@ -80,24 +132,21 @@ If it is a video/audio, include speaker labels if multiple people are talking, a
 Return ONLY the raw extracted text transcript. Do not add conversational filler like "Here is the transcript:".`;
     },
 
+    /**
+     * @param {string} transcript - The extracted transcript
+     * @returns {string} The formatted batch 1 prompt
+     */
     getBatch1Prompt: function(transcript) {
         return `Based on the following transcript, generate a YouTube SEO Pack and Thumbnail Concepts.
-Return the output EXACTLY in this JSON structure:
+First, conduct a Creative Director Analysis to define the core message, target emotion, and unique angle.
+Then, generate the content.
+
+Return the output EXACTLY conforming to this JSON schema:
 {
-  "youtube": "The full formatted YouTube content",
-  "thumbnail": "The full formatted thumbnail content"
+  "_creative_director_analysis": "String. Step-by-step reasoning identifying the core message, target emotion, and unique angle.",
+  "youtube": "String. 5 highly clickable titles, a 300-500 word SEO description with bullet points/timestamps, 15-20 comma-separated tags, and 5-8 hashtags. Use markdown.",
+  "thumbnail": "String. 5 distinct visual concepts. Specify 3-4 words of text, visual composition, facial expression, and background colors. Use markdown."
 }
-
-REQUIREMENTS FOR YOUTUBE:
-- Provide 5 highly clickable Bengali titles (under 60 chars each). Use numbers, curiosity gaps, and strong hooks.
-- Provide a YouTube SEO description (300-500 words). Include an intro, key takeaways in bullet points, and timestamps if chronological order makes sense.
-- Provide 15-20 comma-separated Tags (Mix of Bengali and English).
-- Provide 5-8 relevant Hashtags.
-
-REQUIREMENTS FOR THUMBNAILS:
-- Provide 5 distinct visual concepts for the YouTube thumbnail.
-- For each concept, specify the exact short text to put on the thumbnail (Max 3-4 words, Bengali).
-- Describe the visual composition, facial expression, and background colors.
 
 TRANSCRIPT:
 """
@@ -105,39 +154,23 @@ ${transcript}
 """`;
     },
 
+    /**
+     * @param {string} transcript - The extracted transcript
+     * @returns {string} The formatted batch 2 prompt
+     */
     getBatch2Prompt: function(transcript) {
         return `Based on the following transcript, generate content for Facebook, LinkedIn, Twitter, and a Newsletter.
-Return the output EXACTLY in this JSON structure:
+First, conduct a Creative Director Analysis to define the core message, target emotion, and unique angle.
+Then, generate the content.
+
+Return the output EXACTLY conforming to this JSON schema:
 {
-  "facebook": "The full formatted Facebook post",
-  "linkedin": "The full formatted LinkedIn post",
-  "twitter": "The full formatted Twitter thread",
-  "newsletter": "The full formatted Newsletter snippet"
+  "_creative_director_analysis": "String. Step-by-step reasoning identifying the core message, target emotion, and unique angle.",
+  "facebook": "String. Viral-style post. Start with hook, use PAS formula, heavy line breaks, bullet points. Formatted in markdown.",
+  "linkedin": "String. Professional authority post. Focus on business/industry insights. Formatted cleanly in markdown.",
+  "twitter": "String. 5-8 tweet thread. Numbered. Start with hook ending in 🧵👇. Formatted in markdown.",
+  "newsletter": "String. Subject line under 50 chars, preview text snippet, and scannable email body. Formatted in markdown."
 }
-
-REQUIREMENTS FOR FACEBOOK:
-- Write a viral-style post (150-300 words).
-- Start with a powerful hook line.
-- Use the PAS formula (Problem -> Agitate -> Solution) based on the transcript.
-- Use heavy line breaks and bullet points (✅) for readability.
-- End with a strong Call to Action (CTA) asking a question.
-
-REQUIREMENTS FOR LINKEDIN:
-- Write a professional authority post (100-200 words).
-- Use a mix of English and Bengali if appropriate for a professional audience.
-- Focus on the business/career/industry insight from the transcript.
-- Format cleanly without excessive emojis.
-
-REQUIREMENTS FOR TWITTER/X:
-- Write a 5-8 tweet thread.
-- Tweet 1: Strong hook ending with 🧵👇
-- subsequent tweets: Numbered (2/, 3/, etc.), containing the core value.
-- Last tweet: Summary and CTA.
-
-REQUIREMENTS FOR NEWSLETTER:
-- Provide a compelling Subject Line (under 50 chars).
-- Provide a short Preview Text snippet.
-- Write a scannable email body addressing the subscriber directly, summarizing the transcript's value, and ending with a placeholder link to watch the video.
 
 TRANSCRIPT:
 """
@@ -145,28 +178,21 @@ ${transcript}
 """`;
     },
 
+    /**
+     * @param {string} transcript - The extracted transcript
+     * @returns {string} The formatted batch 3 prompt
+     */
     getBatch3Prompt: function(transcript) {
         return `Based on the following transcript, generate a Shorts/Reels Script and an SEO Blog Article.
-Return the output EXACTLY in this JSON structure:
+First, conduct a Creative Director Analysis to define the core message, target emotion, and unique angle.
+Then, generate the content.
+
+Return the output EXACTLY conforming to this JSON schema:
 {
-  "shorts": "The full formatted Shorts script",
-  "blog": "The full formatted Blog article"
+  "_creative_director_analysis": "String. Step-by-step reasoning identifying the core message, target emotion, and unique angle.",
+  "shorts": "String. 45-60s script. Hook, 3 high-value points, CTA. 2-column format: [Visual Cues] | [Spoken Script]. Formatted in markdown.",
+  "blog": "String. 500-1000 words. H1 Title, Intro, H2/H3 subheadings, bullet lists, Conclusion, and 3-4 FAQs. Formatted in markdown."
 }
-
-REQUIREMENTS FOR SHORTS/REELS SCRIPT:
-- Duration: Target 45-60 seconds of speaking.
-- Hook (0-3s): A high-energy pattern interrupt.
-- Body: 3 quick, high-value points.
-- CTA: Quick engagement ask.
-- Format: Present it as a two-column script [Visual Cues / Text Overlay] on the left, and [Spoken Script] on the right.
-
-REQUIREMENTS FOR SEO BLOG ARTICLE:
-- Length: Comprehensive, 500-1000 words.
-- Structure: Start with an H1 Title. Write an Introduction.
-- Body: Use H2 and H3 subheadings for main points. Use bullet lists for scannability.
-- Conclusion: Summarize the main takeaway.
-- FAQ: Include 3-4 Frequently Asked Questions based on the transcript content.
-- Use proper Markdown headings (#, ##, ###).
 
 TRANSCRIPT:
 """
@@ -174,25 +200,22 @@ ${transcript}
 """`;
     },
 
+    /**
+     * @param {string} transcript - The extracted transcript
+     * @returns {string} The formatted batch 4 prompt
+     */
     getBatch4Prompt: function(transcript) {
         return `Based on the following transcript, generate YouTube Timestamps, SEO Keyword Clusters, and Key Viral Moments.
-Return the output EXACTLY in this JSON structure:
+First, conduct a Creative Director Analysis to define the core message, target emotion, and unique angle.
+Then, generate the content.
+
+Return the output EXACTLY conforming to this JSON schema:
 {
-  "timestamps": "The formatted timestamps",
-  "keywords": "The formatted keyword clusters",
-  "keymoments": "The formatted key moments"
+  "_creative_director_analysis": "String. Step-by-step reasoning identifying the core message, target emotion, and unique angle.",
+  "timestamps": "String. Logical YouTube chapter timestamps with estimated minute marks. Formatted in markdown.",
+  "keywords": "String. 1 primary keyword, 8-10 secondary keywords, 5-8 long-tail search queries, and 5 related questions. Formatted in markdown.",
+  "keymoments": "String. Identify 3-5 viral-worthy segments. Provide timestamp ranges and explain why they make strong clips. Formatted in markdown."
 }
-
-REQUIREMENTS FOR TIMESTAMPS:
-- Analyze the transcript flow and generate logical YouTube chapter timestamps. 
-- Estimate approximate minute marks based on content density and topic shifts. (e.g., 0:00 - Introduction)
-
-REQUIREMENTS FOR KEYWORDS:
-- Extract a keyword cluster from the transcript: 1 primary keyword, 8-10 secondary keywords, 5-8 long-tail Bengali search queries, and 5 related questions people might search for.
-
-REQUIREMENTS FOR KEY MOMENTS:
-- Identify the 3-5 most viral-worthy segments from the transcript — moments with the highest emotional intensity, best sound bites, or most actionable tips.
-- For each, provide an approximate timestamp range and explain why it would make a strong clip for Shorts/Reels.
 
 TRANSCRIPT:
 """
@@ -200,6 +223,12 @@ ${transcript}
 """`;
     },
 
+    /**
+     * Generates the prompt used for scoring an existing piece of content.
+     * @param {string} platform - The target platform.
+     * @param {string} content - The content text to evaluate.
+     * @returns {string} The formatted scoring prompt.
+     */
     getScorePrompt: function(platform, content) {
         return `You are an expert Content Evaluator. Score the following generated content for the platform: ${platform}.
 Analyze the content and return EXACTLY this JSON structure:
@@ -208,9 +237,10 @@ Analyze the content and return EXACTLY this JSON structure:
   "readability": 9,
   "engagement": 7,
   "platform_fit": 9,
-  "suggestions": ["suggestion 1", "suggestion 2"]
+  "suggestions": ["Specific, actionable suggestion 1", "Specific, actionable suggestion 2"],
+  "rewrite": "A rewrite of the weakest sentence from the content to demonstrate your suggestion."
 }
-Scores must be out of 10. Suggestions should be 1-2 short, actionable tips to improve the content.
+Scores must be out of 10. Suggestions should be specific and actionable rather than generic advice.
 
 CONTENT TO SCORE:
 """
