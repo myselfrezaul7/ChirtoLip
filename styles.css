@@ -568,7 +568,7 @@ h1, h2, h3, h4 {
 
 /* Inputs */
 .input-glass {
-    background: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.05);
     border: 1px solid var(--glass-border-strong);
     color: var(--text-primary);
     padding: 0.8rem 1.2rem;
@@ -579,15 +579,15 @@ h1, h2, h3, h4 {
     transition: all 0.3s;
 }
 :root[data-theme="dark"] .input-glass {
-    background: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme]) .input-glass { background: rgba(0, 0, 0, 0.3); }
+    :root:not([data-theme]) .input-glass { background-color: rgba(0, 0, 0, 0.3); }
 }
 
 .input-glass:focus {
     border-color: var(--accent-blue);
-    background: var(--bg-surface-elevated);
+    background-color: var(--bg-surface-elevated);
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
 }
 .input-glass::placeholder {
